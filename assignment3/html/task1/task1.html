@@ -1,0 +1,293 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Task 1</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-25"><meta name="DC.source" content="task1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Task 1</h1><!--introduction--><p><b>Problem:</b> <i>Perform Principal Component Analysis of the <a href="http://archive.ics.uci.edu/ml/datasets/Semeion+Handwritten+Digit">Semeion Handwritten Digit</a> data set and show a scatter plot of the first 2 principal components of all the images in the database</i></p><p>Estimated time is 3 seconds.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Loading Data</a></li><li><a href="#2">Plot Covariance Matrix</a></li><li><a href="#3">Principal Component Analysis</a></li><li><a href="#4">First Two PC</a></li><li><a href="#5">First Two PC with Whitened Data</a></li><li><a href="#6">First Three PC</a></li><li><a href="#7">Explained variance</a></li></ul></div><h2>Loading Data<a name="1"></a></h2><p>Importing data and extracting the last column which is the classification</p><pre class="codeinput">tic;
+data = importdata(<span class="string">'semeion.data'</span>);
+classification = data(:,end);
+data = data(:,1:end-1);
+</pre><h2>Plot Covariance Matrix<a name="2"></a></h2><pre class="codeinput">figure;
+imagesc(cov(data));
+colorbar;
+title(<span class="string">'Covariance matrix of Data'</span>);
+</pre><img vspace="5" hspace="5" src="task1_01.png" alt=""> <h2>Principal Component Analysis<a name="3"></a></h2><pre class="codeinput">coeff = pca(data);
+</pre><h2>First Two PC<a name="4"></a></h2><p>Plotting first two principal components in a 2D scatter plot, then we center the scatter plot.</p><pre class="codeinput">f_two = coeff(:,1:2);
+
+<span class="comment">% Projection</span>
+reduction = data * f_two;
+reduction = reduction';
+
+<span class="comment">% Centering</span>
+reduction = myCenter(reduction);
+
+figure;
+scatter(reduction(1,:), reduction(2,:),10,classification,<span class="string">'filled'</span>);
+title(<span class="string">'First Two Principal Components'</span>);
+xlabel(<span class="string">'First Principal Component'</span>);
+ylabel(<span class="string">'Second Principal Component'</span>);
+colormap(jet(10));
+colorbar;
+</pre><img vspace="5" hspace="5" src="task1_02.png" alt=""> <h2>First Two PC with Whitened Data<a name="5"></a></h2><p>Whitening of data and scatter plot of the first two PC, then we center the plot.</p><pre class="codeinput"><span class="comment">% Whitening</span>
+w_data = whitening(data);
+
+<span class="comment">% PCA</span>
+w_coeff = pca(w_data);
+w_f_two = coeff(:,1:2);
+
+<span class="comment">% Projection</span>
+reduction = w_data * w_f_two;
+reduction = reduction';
+
+<span class="comment">% Centering</span>
+reduction = myCenter(reduction);
+
+figure;
+scatter(reduction(1,:), reduction(2,:),10,classification,<span class="string">'filled'</span>);
+title(<span class="string">'First Two Principal Components with Whitened Data'</span>);
+xlabel(<span class="string">'First Principal Component'</span>);
+ylabel(<span class="string">'Second Principal Component'</span>);
+colormap(jet(10));
+colorbar;
+
+figure;
+imagesc(cov(w_data));
+colorbar;
+title(<span class="string">'Covariance matrix of Whitened Data'</span>);
+</pre><img vspace="5" hspace="5" src="task1_03.png" alt=""> <img vspace="5" hspace="5" src="task1_04.png" alt=""> <h2>First Three PC<a name="6"></a></h2><p>First three principal components in a 3D scatter plot.</p><pre class="codeinput">f_three = coeff(:,1:3);
+reduction = data * f_three;
+reduction = reduction';
+
+figure;
+scatter3(reduction(1,:), reduction(2,:), reduction(3,:), 10, classification, <span class="string">'filled'</span>);
+title(<span class="string">'First 3 Principal Components'</span>);
+colormap(jet(10));
+colorbar;
+</pre><img vspace="5" hspace="5" src="task1_05.png" alt="">
+
+<img vspace="5" hspace="5" src="3d.gif" alt="">
+
+ <h2>Explained variance<a name="7"></a></h2><p>As we can see the first 25 principal components have the highest percentage of variance contribution.</p><pre class="codeinput">[coeff,score,latent,tsquared,explained,mu] = pca(data);
+
+figure;
+plot(explained);
+grid <span class="string">on</span>;
+axis([1 256 0 8]);
+title(<span class="string">'Explained variance'</span>);
+set(gca, <span class="string">'xtick'</span>, [0:20:45 60:30:256] );
+set(gca, <span class="string">'xminortick'</span>,<span class="string">'on'</span>);
+set(gca, <span class="string">'xminorgrid'</span>,<span class="string">'on'</span>);
+xlabel(<span class="string">'Principal Components'</span>);
+ylabel(<span class="string">'Percentage of the total variance'</span>);
+
+v=[];
+<span class="keyword">for</span> i = 1:256
+
+    v = [v; sum(explained(1:i))];
+
+<span class="keyword">end</span>
+
+figure;
+plot(v);
+grid <span class="string">on</span>;
+set(gca, <span class="string">'xtick'</span>, [0:20:45 60:30:256] );
+xlabel(<span class="string">'Principal Components'</span>);
+ylabel(<span class="string">'Percentage sum to total Variance'</span>);
+title(<span class="string">'Explained variance'</span>);
+set(gca, <span class="string">'xminortick'</span>,<span class="string">'on'</span>);
+set(gca, <span class="string">'xminorgrid'</span>,<span class="string">'on'</span>);
+toc
+</pre><pre class="codeoutput">Elapsed time is 3.431497 seconds.
+</pre><img vspace="5" hspace="5" src="task1_06.png" alt=""> <img vspace="5" hspace="5" src="task1_07.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Task 1
+% *Problem:* _Perform Principal Component Analysis of the <http://archive.ics.uci.edu/ml/datasets/Semeion+Handwritten+Digit Semeion Handwritten Digit> data set and show a scatter plot of the first 2 principal components of all the images in the database_
+%
+% Estimated time is 3 seconds.
+
+
+%% Loading Data
+% Importing data and extracting the last column which is the classification
+tic;
+data = importdata('semeion.data');
+classification = data(:,end); 
+data = data(:,1:end-1);
+
+%% Plot Covariance Matrix
+
+figure;
+imagesc(cov(data));
+colorbar;
+title('Covariance matrix of Data');
+
+
+%% Principal Component Analysis 
+
+coeff = pca(data);
+
+%% First Two PC
+% Plotting first two principal components in a 2D scatter plot, then we
+% center the scatter plot.
+
+f_two = coeff(:,1:2);
+
+% Projection
+reduction = data * f_two;
+reduction = reduction';
+
+% Centering
+reduction = myCenter(reduction); 
+
+figure;
+scatter(reduction(1,:), reduction(2,:),10,classification,'filled');
+title('First Two Principal Components');
+xlabel('First Principal Component');
+ylabel('Second Principal Component');
+colormap(jet(10));
+colorbar;
+
+%% First Two PC with Whitened Data
+% Whitening of data and scatter plot of the first two PC, then we center
+% the plot.
+
+% Whitening
+w_data = whitening(data);
+
+% PCA
+w_coeff = pca(w_data);
+w_f_two = coeff(:,1:2);
+
+% Projection
+reduction = w_data * w_f_two;
+reduction = reduction';
+
+% Centering
+reduction = myCenter(reduction);
+
+figure;
+scatter(reduction(1,:), reduction(2,:),10,classification,'filled');
+title('First Two Principal Components with Whitened Data');
+xlabel('First Principal Component');
+ylabel('Second Principal Component');
+colormap(jet(10));
+colorbar;
+
+figure;
+imagesc(cov(w_data));
+colorbar;
+title('Covariance matrix of Whitened Data');
+
+%% First Three PC
+% First three principal components in a 3D scatter plot.
+
+f_three = coeff(:,1:3);
+reduction = data * f_three;
+reduction = reduction';
+
+figure;
+scatter3(reduction(1,:), reduction(2,:), reduction(3,:), 10, classification, 'filled');
+title('First 3 Principal Components');
+colormap(jet(10));
+colorbar;
+
+
+%% Explained variance 
+% As we can see the first 25 principal components have the highest
+% percentage of variance contribution.
+
+[coeff,score,latent,tsquared,explained,mu] = pca(data);
+
+figure;
+plot(explained);
+grid on;
+axis([1 256 0 8]);
+title('Explained variance');
+set(gca, 'xtick', [0:20:45 60:30:256] );
+set(gca, 'xminortick','on');
+set(gca, 'xminorgrid','on');
+xlabel('Principal Components');
+ylabel('Percentage of the total variance');
+
+v=[];
+for i = 1:256
+
+    v = [v; sum(explained(1:i))];
+  
+end
+
+figure;
+plot(v);
+grid on;
+set(gca, 'xtick', [0:20:45 60:30:256] );
+xlabel('Principal Components');
+ylabel('Percentage sum to total Variance');
+title('Explained variance');
+set(gca, 'xminortick','on');
+set(gca, 'xminorgrid','on');
+toc
+
+##### SOURCE END #####
+--></body></html>

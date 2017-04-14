@@ -1,0 +1,197 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Task 3</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-24"><meta name="DC.source" content="task3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Task 3</h1><!--introduction--><p><b>Problem:</b> <i>test the K-nn algorithm using all the dimensions available, but computing the distances on the whitened data.</i></p><p>Estimated time 21 seconds</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Loading Data</a></li><li><a href="#2">Whitening</a></li><li><a href="#3">K-NN Classification</a></li><li><a href="#4">Plot</a></li></ul></div><h2>Loading Data<a name="1"></a></h2><p>We import the data, then we split it in observations and classification.</p><pre class="codeinput">tic;
+data = importdata(<span class="string">'semeion.data'</span>);
+classification = data(:,end);
+data = data(:,1:end-1);
+</pre><h2>Whitening<a name="2"></a></h2><pre class="codeinput">data = whitening(data);
+</pre><h2>K-NN Classification<a name="3"></a></h2><p>We perform classification with six different <tt>k</tt> values. Each classification instance accuracy is the average of 50 instances trained according to the problem. (The number of instances is increased since it is pretty fast)</p><pre class="codeinput">accuracy = [];
+avg_accuracies = [];
+
+<span class="keyword">for</span> k = [1 2 3:2:9]
+
+    <span class="comment">% 50 different training and test sets</span>
+    <span class="keyword">for</span> j = 1:50
+
+        <span class="comment">% Randomizing training set</span>
+        [training_set, test_set] = randomsamples(10,[data,classification]);
+        mdl = fitcknn(training_set(:,1:256), training_set(:,end),<span class="string">'NumNeighbors'</span>,k);
+
+        <span class="comment">% Get the prediction</span>
+        prediction = predict(mdl, test_set(:,1:256));
+        accuracy =[accuracy ; sum(prediction == test_set(:,end))/size(test_set,1)];
+
+    <span class="keyword">end</span>
+
+        <span class="comment">% Average accuracy of the 50 run</span>
+        avg = mean(accuracy);
+        avg_accuracies =[avg_accuracies ,  avg];
+        accuracy = [];
+        fprintf(<span class="string">'k = %d, PC = %d, Avg = %f \n '</span>,k,i, avg);
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">k = 1, PC = 1, Avg = 0.315151 
+ k = 2, PC = 1, Avg = 0.255419 
+ k = 3, PC = 1, Avg = 0.255124 
+ k = 5, PC = 1, Avg = 0.259853 
+ k = 7, PC = 1, Avg = 0.251628 
+ k = 9, PC = 1, Avg = 0.235727 
+ </pre><h2>Plot<a name="4"></a></h2><pre class="codeinput">figure;
+hold <span class="string">on</span>;
+
+<span class="keyword">for</span> i = 1: size(avg_accuracies,1)
+    plot(avg_accuracies(i,:));
+<span class="keyword">end</span>
+
+hold <span class="string">off</span>;
+
+grid <span class="string">on</span>;
+axis([1 6 0.2 0.35]);
+set(gca, <span class="string">'xtick'</span>, [1 2 3 4 5 6] );
+set(gca, <span class="string">'xticklabel'</span>, [1 2 3 5 7 9] );
+xlabel(<span class="string">'K'</span>);
+ylabel(<span class="string">'Average accuracy on 50 knn instances'</span>);
+set(gca, <span class="string">'yminortick'</span>,<span class="string">'on'</span>);
+set(gca, <span class="string">'yminorgrid'</span>,<span class="string">'on'</span>);
+title(<span class="string">'KNN and Whitened Data'</span>);
+toc;
+</pre><pre class="codeoutput">Elapsed time is 20.490574 seconds.
+</pre><img vspace="5" hspace="5" src="task3_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Task 3
+% *Problem:* _test the $K$-nn algorithm using all the dimensions available, but computing the distances on the whitened data._
+% 
+% Estimated time 21 seconds
+
+%% Loading Data
+% We import the data, then we split it in observations and classification. 
+tic;
+data = importdata('semeion.data');
+classification = data(:,end); 
+data = data(:,1:end-1);
+
+%% Whitening
+data = whitening(data);
+
+%% K-NN Classification
+% We perform classification with six different |k| values. Each
+% classification instance accuracy is the average of 50 instances trained
+% according to the problem. (The number of instances is increased since it
+% is pretty fast)
+
+accuracy = [];
+avg_accuracies = [];
+
+for k = [1 2 3:2:9] 
+
+    % 50 different training and test sets
+    for j = 1:50
+        
+        % Randomizing training set
+        [training_set, test_set] = randomsamples(10,[data,classification]);
+        mdl = fitcknn(training_set(:,1:256), training_set(:,end),'NumNeighbors',k);
+        
+        % Get the prediction
+        prediction = predict(mdl, test_set(:,1:256));
+        accuracy =[accuracy ; sum(prediction == test_set(:,end))/size(test_set,1)];
+        
+    end
+    
+        % Average accuracy of the 50 run
+        avg = mean(accuracy);
+        avg_accuracies =[avg_accuracies ,  avg];
+        accuracy = [];
+        fprintf('k = %d, PC = %d, Avg = %f \n ',k,i, avg);
+    
+end
+
+
+%% Plot
+
+figure;
+hold on;
+    
+for i = 1: size(avg_accuracies,1)
+    plot(avg_accuracies(i,:));
+end
+    
+hold off;
+    
+grid on;
+axis([1 6 0.2 0.35]);
+set(gca, 'xtick', [1 2 3 4 5 6] );
+set(gca, 'xticklabel', [1 2 3 5 7 9] );
+xlabel('K');
+ylabel('Average accuracy on 50 knn instances');
+set(gca, 'yminortick','on');
+set(gca, 'yminorgrid','on');
+title('KNN and Whitened Data');
+toc;
+##### SOURCE END #####
+--></body></html>

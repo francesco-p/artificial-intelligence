@@ -1,0 +1,261 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>myICA</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-24"><meta name="DC.source" content="myICA.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [Zica A T mu] = myICA(Z,r,dispFlag)
+<span class="comment">%--------------------------------------------------------------------------</span>
+<span class="comment">% Syntax:       Zica = myICA(Z,r);</span>
+<span class="comment">%               Zica = myICA(Z,r,dispFlag);</span>
+<span class="comment">%               [Zica A T mu] = myICA(Z,r);</span>
+<span class="comment">%               [Zica A T mu] = myICA(Z,r,dispFlag);</span>
+<span class="comment">%</span>
+<span class="comment">% Inputs:       Z is an (d x n) matrix containing n samples of an</span>
+<span class="comment">%               d-dimensional random vector</span>
+<span class="comment">%</span>
+<span class="comment">%               r is the desired number of independent components</span>
+<span class="comment">%</span>
+<span class="comment">%               [OPTIONAL] dispFlag = {true false} sets the stdout print</span>
+<span class="comment">%               state. The default value is dispFlag = true</span>
+<span class="comment">%</span>
+<span class="comment">% Outputs:      Zica is an (r x n) matrix containing the r independent</span>
+<span class="comment">%               components - scaled to variance 1 - of the input samples</span>
+<span class="comment">%</span>
+<span class="comment">%               A and T are the ICA transformation matrices such that</span>
+<span class="comment">%               Zr = T \ pinv(A) * Zica + repmat(mu,1,n);</span>
+<span class="comment">%               is the r-dimensional ICA approximation of Z</span>
+<span class="comment">%</span>
+<span class="comment">%               mu is the (d x 1) sample mean of Z</span>
+<span class="comment">%</span>
+<span class="comment">% Description:  This function performs independent component analysis (ICA)</span>
+<span class="comment">%               on the input samples using the FastICA algorithm with</span>
+<span class="comment">%               Gaussian negentropy</span>
+<span class="comment">%</span>
+<span class="comment">% Author:       Brian Moore</span>
+<span class="comment">%               brimoor@umich.edu</span>
+<span class="comment">%</span>
+<span class="comment">% Date:         April 26, 2015</span>
+<span class="comment">%--------------------------------------------------------------------------</span>
+
+<span class="comment">% Knobs</span>
+eps = 1e-6;         <span class="comment">% Convergence criteria</span>
+maxSamples = 1000;  <span class="comment">% Max # data points in sample mean calculation</span>
+maxIters = 100;     <span class="comment">% Maximum # iterations</span>
+
+<span class="comment">% Parse display flag</span>
+dispFlag = (nargin &lt; 3) || dispFlag;
+
+<span class="comment">% Center and whiten input data</span>
+[Zcw T mu] = myCenterAndWhiten(Z);
+
+<span class="comment">% Parse whitened data</span>
+[d n] = size(Zcw);
+<span class="keyword">if</span> (n &gt; maxSamples)
+    <span class="comment">% Truncate data for sample mean calculations</span>
+    Zcwt = Zcw(:,randperm(n,maxSamples));
+<span class="keyword">else</span>
+    <span class="comment">% Full data</span>
+    Zcwt = Zcw;
+<span class="keyword">end</span>
+
+<span class="comment">% Random initial weights</span>
+normRows = @(X) bsxfun(@times,X,1 ./ sqrt(sum(X.^2,2)));
+W = normRows(rand(r,d));
+
+<span class="comment">% FastICA w/ Gaussian negentropy</span>
+k = 0;
+err = inf;
+<span class="keyword">while</span> (err &gt; eps) &amp;&amp; (k &lt; maxIters)
+    <span class="comment">% Increment counter</span>
+    k = k + 1;
+
+    <span class="comment">% Update weights</span>
+    Wlast = W; <span class="comment">% Save last weights</span>
+    Sk = permute(Wlast * Zcwt,[1 3 2]);
+    G = Sk .* exp(-0.5 * Sk.^2);
+    Gp = Sk .* G;
+    W = mean(bsxfun(@times,G,permute(Zcwt,[3 1 2])),3) + bsxfun(@times,mean(Gp,3),Wlast);
+    W = normRows(W);
+
+    <span class="comment">% Decorrelate weights</span>
+    [U,S,~] = svd(W,<span class="string">'econ'</span>);
+    W = U * diag(1 ./ diag(S)) * U' * W;
+
+    <span class="comment">% Update error</span>
+    err = max(1 - dot(W,Wlast,2));
+
+    <span class="comment">% Display progress</span>
+    <span class="keyword">if</span> dispFlag == true
+        sprintf(<span class="string">'Iteration %i: max(1 - &lt;w%i,w%i&gt;) = %.4g\n'</span>,k,k,k - 1,err);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Transformation matrix</span>
+A = W;
+
+<span class="comment">% Independent components</span>
+Zica = A * Zcw;
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in myICA (line 44)
+[Zcw T mu] = myCenterAndWhiten(Z);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [Zica A T mu] = myICA(Z,r,dispFlag)
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Syntax:       Zica = myICA(Z,r);
+%               Zica = myICA(Z,r,dispFlag);
+%               [Zica A T mu] = myICA(Z,r);
+%               [Zica A T mu] = myICA(Z,r,dispFlag);
+%               
+% Inputs:       Z is an (d x n) matrix containing n samples of an
+%               d-dimensional random vector
+%               
+%               r is the desired number of independent components
+%               
+%               [OPTIONAL] dispFlag = {true false} sets the stdout print
+%               state. The default value is dispFlag = true
+%               
+% Outputs:      Zica is an (r x n) matrix containing the r independent
+%               components - scaled to variance 1 - of the input samples
+%               
+%               A and T are the ICA transformation matrices such that
+%               Zr = T \ pinv(A) * Zica + repmat(mu,1,n);
+%               is the r-dimensional ICA approximation of Z
+%               
+%               mu is the (d x 1) sample mean of Z
+%               
+% Description:  This function performs independent component analysis (ICA)
+%               on the input samples using the FastICA algorithm with 
+%               Gaussian negentropy
+%               
+% Author:       Brian Moore
+%               brimoor@umich.edu
+%               
+% Date:         April 26, 2015
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+% Knobs
+eps = 1e-6;         % Convergence criteria
+maxSamples = 1000;  % Max # data points in sample mean calculation
+maxIters = 100;     % Maximum # iterations
+
+% Parse display flag
+dispFlag = (nargin < 3) || dispFlag;
+
+% Center and whiten input data
+[Zcw T mu] = myCenterAndWhiten(Z);
+
+% Parse whitened data
+[d n] = size(Zcw);
+if (n > maxSamples)
+    % Truncate data for sample mean calculations
+    Zcwt = Zcw(:,randperm(n,maxSamples));
+else
+    % Full data
+    Zcwt = Zcw;
+end
+
+% Random initial weights
+normRows = @(X) bsxfun(@times,X,1 ./ sqrt(sum(X.^2,2)));
+W = normRows(rand(r,d));
+
+% FastICA w/ Gaussian negentropy
+k = 0;
+err = inf;
+while (err > eps) && (k < maxIters)
+    % Increment counter
+    k = k + 1;
+    
+    % Update weights
+    Wlast = W; % Save last weights
+    Sk = permute(Wlast * Zcwt,[1 3 2]);
+    G = Sk .* exp(-0.5 * Sk.^2);
+    Gp = Sk .* G;
+    W = mean(bsxfun(@times,G,permute(Zcwt,[3 1 2])),3) + bsxfun(@times,mean(Gp,3),Wlast);
+    W = normRows(W);
+    
+    % Decorrelate weights
+    [U,S,~] = svd(W,'econ');
+    W = U * diag(1 ./ diag(S)) * U' * W;
+    
+    % Update error
+    err = max(1 - dot(W,Wlast,2));
+    
+    % Display progress
+    if dispFlag == true
+        sprintf('Iteration %i: max(1 - <w%i,w%i>) = %.4g\n',k,k,k - 1,err);
+    end
+end
+
+% Transformation matrix
+A = W;
+
+% Independent components
+Zica = A * Zcw;
+
+##### SOURCE END #####
+--></body></html>
